@@ -32,17 +32,17 @@ export const TreeVisualizer: FC<TreeProps> = ({ nodes}) => {
   const attributes = Object.keys(nodes[0].data)
   return (
     <TableContainer component={Paper}>
-    <Table aria-label="collapsible table" size="small">
-      <TableHead>
-        <NodeAttributesVisualizer attributes={ attributes }/>
-      </TableHead>
-      <TableBody>
-        {nodes.map((node) => (
-            <NodeRowVisualizer node={node} />
-        ))}
-      </TableBody>
-    </Table>
-  </TableContainer>
+      <Table aria-label="collapsible table" size="small">
+        <TableHead>
+          <NodeAttributesVisualizer attributes={ attributes }/>
+        </TableHead>
+        <TableBody>
+          {nodes.map((node) => (
+              <NodeRowVisualizer node={node} />
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   )
 }
 
