@@ -3,10 +3,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { TreeVisualizer } from './TreeVisualizer';
+import nodes from './mocks/data.json'
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    {/* <App /> */}
+    <TreeVisualizer nodes={nodes}/>
   </React.StrictMode>,
   document.getElementById('root')
 );
