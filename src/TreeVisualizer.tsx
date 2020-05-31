@@ -38,7 +38,7 @@ export const TreeVisualizer: FC<TreeProps> = ({ nodes}) => {
         </TableHead>
         <TableBody>
           {nodes.map((node) => (
-              <NodeRowVisualizer node={node} />
+              <NodeRowVisualizer key={Object.entries(node.data).toString()} node={node} />
           ))}
         </TableBody>
       </Table>
@@ -55,8 +55,8 @@ const NodeAttributesVisualizer: FC<TableHeadProps> = ({ attributes }) => {
     <TableRow>
       {/* empty cell for the expand/collapse button */}
       <TableCell />
-      {attributes.map(attribute =>
-          <TableCell align="right">{attribute}</TableCell>
+      {attributes.map((attribute, index) =>
+          <TableCell align="right" key={index}>{attribute}</TableCell>
       )}
     </TableRow>
   )
@@ -92,7 +92,7 @@ const NodeRowVisualizer: FC<RowProps> = ({ node: {data, kids} }) => {
             </IconButton>
           )}
         </TableCell>
-        { dataValues.map(datum => <TableCell align="right">{datum}</TableCell>) }
+        { dataValues.map((datum, index) => <TableCell key={index} align="right">{datum}</TableCell>) }
       </TableRow>
 
       <TableRow>
@@ -117,13 +117,13 @@ const KidTables: FC<KidsProps> = ({ kids }) => {
   return (
     <>
       { entries.map(([kidName, {records: kidsNodes}]) =>
-        <>
+        <React.Fragment key={kidName}>
           <Typography variant="h6" gutterBottom component="div">
             {kidName}
           </Typography>
 
           <TreeVisualizer nodes={kidsNodes} />
-        </>
+        </React.Fragment>
       )}
     </>
   );
