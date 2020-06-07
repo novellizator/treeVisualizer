@@ -16,19 +16,29 @@ import {
 
 import { Node, NodeKids, NodeData } from './treeTypes'
 
-import { KeyboardArrowUp, KeyboardArrowDown } from '@material-ui/icons'
+import { KeyboardArrowUp, KeyboardArrowDown, Delete } from '@material-ui/icons'
 
-import { isObjectEmpty } from './utils'
+import { isObjectEmpty } from '../../utils'
+import { connect } from 'react-redux'
 
-// https://codesandbox.io/s/kbcee?file=/demo.js
+import { treeVisualizationAction } from './reducer'
+import { AppState } from "../rootReducer";
 
-interface TreeProps {
+// Design stolen from https://codesandbox.io/s/kbcee?file=/demo.js
+interface StateProps {
   nodes: Node[]
 }
+interface DispatchProps {
+  removeElement: typeof treeVisualizationAction.removeElement
+}
 
-export const TreeVisualizer: FC<TreeProps> = ({ nodes}) => {
-  // we're workig under the assumption that every node on the same level
+type Props = StateProps & DispatchProps
+export const TreeVisualizer: FC<Props> = ({ nodes, removeElement }) => {
+  // we're working with the assumption that every node on the same level
   // has the same attributes in the same order
+  if (nodes.length === 0) {
+    return null
+  }
   const attributes = Object.keys(nodes[0].data)
   return (
     <TableContainer component={Paper}>
@@ -38,7 +48,7 @@ export const TreeVisualizer: FC<TreeProps> = ({ nodes}) => {
         </TableHead>
         <TableBody>
           {nodes.map((node) => (
-              <NodeRowVisualizer key={Object.entries(node.data).toString()} node={node} />
+            <NodeRowVisualizer key={Object.entries(node.data).toString()} node={node} deleteSelf={() => console.log("removing", node.data._id, removeElement(node.data._id)) } />
           ))}
         </TableBody>
       </Table>
@@ -56,14 +66,16 @@ const NodeAttributesVisualizer: FC<TableHeadProps> = ({ attributes }) => {
       {/* empty cell for the expand/collapse button */}
       <TableCell />
       {attributes.map((attribute, index) =>
-          <TableCell align="right" key={index}>{attribute}</TableCell>
+        <TableCell align="right" key={index}>{attribute}</TableCell>
       )}
+      <TableCell />
     </TableRow>
   )
 }
 
 interface RowProps {
   node: Node
+  deleteSelf: () => void
 }
 
 const useRowStyles = makeStyles({
@@ -74,7 +86,7 @@ const useRowStyles = makeStyles({
   },
 });
 
-const NodeRowVisualizer: FC<RowProps> = ({ node: {data, kids} }) => {
+const NodeRowVisualizer: FC<RowProps> = ({ node: {data, kids}, deleteSelf }) => {
   const [open, setOpen] = React.useState(false);
   const classes = useRowStyles();
 
@@ -93,11 +105,17 @@ const NodeRowVisualizer: FC<RowProps> = ({ node: {data, kids} }) => {
           )}
         </TableCell>
         { dataValues.map((datum, index) => <TableCell key={index} align="right">{datum}</TableCell>) }
+
+        <TableCell>
+          <IconButton aria-label="delete subtree" size="small" onClick={ deleteSelf }>
+            <Delete />
+          </IconButton>
+        </TableCell>
       </TableRow>
 
       <TableRow>
         <TableCell colSpan={numberOfColumns}>
-        <Collapse in={open} timeout="auto"> {/* unmountOnExit */}
+        <Collapse in={open} timeout="auto">
           <Box margin={1}>
             <KidTables kids={kids} />
           </Box>
@@ -122,9 +140,22 @@ const KidTables: FC<KidsProps> = ({ kids }) => {
             {kidName}
           </Typography>
 
-          <TreeVisualizer nodes={kidsNodes} />
+          <DispatchingTreeVisualizer nodes={kidsNodes} />
         </React.Fragment>
       )}
     </>
   );
 }
+
+const DispatchingTreeVisualizer = connect<{}, DispatchProps, {}, AppState>(
+  null,
+  {
+    removeElement: treeVisualizationAction.removeElement
+  }
+)(TreeVisualizer)
+
+export const ConnectedTreeVisualizer = connect<StateProps, {}, {}, AppState>(
+  (state) => ({
+    nodes: state.visualizedTreeState.tree
+  })
+)(DispatchingTreeVisualizer)

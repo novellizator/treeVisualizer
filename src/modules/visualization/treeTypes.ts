@@ -4,11 +4,11 @@ export interface Node {
 }
 
 export interface NodeData {
-  [key: string]: string;
+  [key: string]: string
 }
 
 export interface NodeKids {
-  [key: string]: RecordedNode;
+  [key: string]: RecordedNode
 }
 
 export interface RecordedNode {
