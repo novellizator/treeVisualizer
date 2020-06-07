@@ -14,7 +14,7 @@ import {
   Typography
 } from '@material-ui/core';
 
-import { Node, NodeKids, NodeData } from './treeTypes'
+import { IdentifiedNode, IdentifiedData, NodeKids, NodeData } from './treeTypes'
 
 import { KeyboardArrowUp, KeyboardArrowDown, Delete } from '@material-ui/icons'
 
@@ -26,7 +26,7 @@ import { AppState } from "../rootReducer";
 
 // Design stolen from https://codesandbox.io/s/kbcee?file=/demo.js
 interface StateProps {
-  nodes: Node[]
+  nodes: IdentifiedNode[]
 }
 interface DispatchProps {
   removeElement: typeof treeVisualizationAction.removeElement
@@ -48,7 +48,7 @@ export const TreeVisualizer: FC<Props> = ({ nodes, removeElement }) => {
         </TableHead>
         <TableBody>
           {nodes.map((node) => (
-            <NodeRowVisualizer key={Object.entries(node.data).toString()} node={node} deleteSelf={() => console.log("removing", node.data._id, removeElement(node.data._id)) } />
+            <NodeRowVisualizer key={Object.entries(node.data).toString()} node={node} deleteSelf={() =>  removeElement(node.data._id) } />
           ))}
         </TableBody>
       </Table>
@@ -74,7 +74,7 @@ const NodeAttributesVisualizer: FC<TableHeadProps> = ({ attributes }) => {
 }
 
 interface RowProps {
-  node: Node
+  node: IdentifiedNode
   deleteSelf: () => void
 }
 
@@ -127,7 +127,7 @@ const NodeRowVisualizer: FC<RowProps> = ({ node: {data, kids}, deleteSelf }) => 
 }
 
 interface KidsProps {
-  kids: NodeKids
+  kids: NodeKids<IdentifiedData>
 }
 
 const KidTables: FC<KidsProps> = ({ kids }) => {
@@ -147,14 +147,14 @@ const KidTables: FC<KidsProps> = ({ kids }) => {
   );
 }
 
-const DispatchingTreeVisualizer = connect<{}, DispatchProps, {}, AppState>(
+const DispatchingTreeVisualizer = connect<unknown, DispatchProps, unknown, AppState>(
   null,
   {
     removeElement: treeVisualizationAction.removeElement
   }
 )(TreeVisualizer)
 
-export const ConnectedTreeVisualizer = connect<StateProps, {}, {}, AppState>(
+export const ConnectedTreeVisualizer = connect<StateProps, unknown, unknown, AppState>(
   (state) => ({
     nodes: state.visualizedTreeState.tree
   })
