@@ -1,10 +1,10 @@
-import { Node } from './treeTypes'
+import { Node, NodeData, IdentifiedData, RecordedNode, NodeKids, IdentifiedNode } from './treeTypes'
 
 let uniqueId = 1
 export const generateUniqueId = () => String(uniqueId++)
 
 // tree walk utils
-export const visualizationTreeWalk = (transformation: (n: Node) => Node | null ) => (nodeArray: Node[]) => {
+export const visualizationTreeWalk = <S extends NodeData, T extends NodeData>(transformation: (n: Node<S>) => Node<T> | null ) => (nodeArray: Node<S>[]): Node<T>[]  => {
   return nodeArray
     .map(node => {
       const newNode = transformation(node)
@@ -12,21 +12,21 @@ export const visualizationTreeWalk = (transformation: (n: Node) => Node | null )
         return null
       }
       const recordedNodes = Object.values(newNode.kids)
-      recordedNodes.forEach(recordedNode => {
-        recordedNode.records = visualizationTreeWalk(transformation)(recordedNode.records)
+      recordedNodes.forEach((recordedNode) => {
+        recordedNode.records = visualizationTreeWalk(transformation)(recordedNode.records as any as Node<S>[]) as any as Node<T>[]
       })
       return newNode
     })
-    .filter(node => node != null) as Node[]
+    .filter(node => node != null) as Node<T>[]
 }
 
-export const addIdToTree = visualizationTreeWalk((node) => {
+export const addIdToTree = visualizationTreeWalk<NodeData, IdentifiedData>((node) => {
   node.data._id = generateUniqueId()
-  return node
+  return node as IdentifiedNode
 })
 
-export const removeElementFromTree = (elementId: string) =>
-  visualizationTreeWalk((node) => {
+export const removeElementFromTree = <S extends NodeData>(elementId: string) =>
+  visualizationTreeWalk((node: Node<S>) => {
     if (node.data._id === elementId) {
       return null
     }
