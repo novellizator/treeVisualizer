@@ -1,4 +1,4 @@
-import { Node, NodeData, IdentifiedData, RecordedNode, NodeKids, IdentifiedNode } from './treeTypes'
+import { Node, NodeData, IdentifiedData, IdentifiedNode } from './treeTypes'
 
 let uniqueId = 1
 export const generateUniqueId = () => String(uniqueId++)
@@ -13,7 +13,7 @@ export const visualizationTreeWalk = <S extends NodeData, T extends NodeData>(tr
       }
       const recordedNodes = Object.values(newNode.kids)
       recordedNodes.forEach((recordedNode) => {
-        recordedNode.records = visualizationTreeWalk(transformation)(recordedNode.records as any as Node<S>[]) as any as Node<T>[]
+        recordedNode.records = visualizationTreeWalk(transformation)(recordedNode.records as any as Node<S>[])
       })
       return newNode
     })
