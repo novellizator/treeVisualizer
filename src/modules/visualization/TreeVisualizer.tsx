@@ -23,6 +23,7 @@ import { connect } from 'react-redux'
 
 import { treeVisualizationAction } from './reducer'
 import { AppState } from "../rootReducer";
+import { render } from "@testing-library/react";
 
 // Design stolen from https://codesandbox.io/s/kbcee?file=/demo.js
 interface StateProps {
@@ -33,27 +34,39 @@ interface DispatchProps {
 }
 
 type Props = StateProps & DispatchProps
-export const TreeVisualizer: FC<Props> = ({ nodes, removeElement }) => {
-  // we're working with the assumption that every node on the same level
-  // has the same attributes in the same order
-  if (nodes.length === 0) {
-    return null
+export class TreeVisualizer extends React.Component<Props> {
+  shouldComponentUpdate(nextProps: Props) {
+    console.log('p, np', this.props.nodes.length > 0 ? this.props.nodes[0] === nextProps.nodes[0] : 'n/a', this.props, nextProps)
+    return true
   }
-  const attributes = Object.keys(nodes[0].data)
-  return (
-    <TableContainer component={Paper}>
-      <Table aria-label="collapsible table" size="small">
-        <TableHead>
-          <NodeAttributesVisualizer attributes={ attributes }/>
-        </TableHead>
-        <TableBody>
-          {nodes.map((node) => (
-            <NodeRowVisualizer key={Object.entries(node.data).toString()} node={node} deleteSelf={() =>  removeElement(node.data._id) } />
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  )
+  render() {
+    const { nodes, removeElement } = this.props
+    console.log("render tree visualizer", nodes)
+    // we're working with the assumption that every node on the same level
+    // has the same attributes in the same order
+    if (nodes.length === 0) {
+      return null
+    }
+    const attributes = Object.keys(nodes[0].data)
+    return (
+      <TableContainer component={Paper}>
+        <Table aria-label="collapsible table" size="small">
+          <TableHead>
+            <NodeAttributesVisualizer attributes={ attributes }/>
+          </TableHead>
+          <TableBody>
+            {nodes.map((node) => (
+              <NodeRowVisualizer key={Object.entries(node.data).toString()} node={node} deleteSelf={() => removeElement(node.data._id) } />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    )
+  }
+}
+
+export const TreeVisualizer2: FC<Props> = ({ nodes, removeElement }) => {
+  return null
 }
 
 interface TableHeadProps {

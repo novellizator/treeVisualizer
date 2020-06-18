@@ -33,3 +33,30 @@ export const removeElementFromTree = <S extends NodeData>(elementId: string) =>
     return node
   })
 
+export const removeElementFromTree2 = (treeArray: IdentifiedNode[], elementId: string): [boolean, IdentifiedNode[]] => {
+  const foundIndex = treeArray.findIndex(tree => tree.data._id == elementId)
+  if (foundIndex != -1) {
+    const newArray = [...treeArray]
+    newArray.splice(foundIndex, 1)
+    return [true, newArray]
+  }
+  let didModify = false
+  const ret  = treeArray.map(tree => {
+    for (const recordedNodeKey in tree.kids) {
+      const nodes = tree.kids[recordedNodeKey].records
+      const [didRemove, newNodes] = removeElementFromTree2(nodes, elementId)
+      didModify = didRemove
+      if (didRemove) {
+        tree.kids[recordedNodeKey].records = newNodes
+        break
+      } else {
+        continue
+      }
+    }
+    return tree
+  })
+
+  return [didModify, ret]
+}
+
+

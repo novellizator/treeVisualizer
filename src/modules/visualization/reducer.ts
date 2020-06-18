@@ -1,7 +1,7 @@
 import { IdentifiedNode, IdentifiedData } from './treeTypes'
 import { Reducer } from 'redux'
 import { ActionType, createAction } from 'typesafe-actions';
-import { removeElementFromTree } from './utils'
+import { removeElementFromTree, removeElementFromTree2 } from './utils'
 import nodes from '../../mocks/data.json'
 import { addIdToTree } from '../../modules/visualization/utils'
 
@@ -28,9 +28,10 @@ export const treeVisualizationReducer: Reducer<TreeVisualizationState, TreeVisua
   switch (action.type) {
     case TreeVisualizationActionNames.removeElement:
       const element = String(action.payload.elementId)
+      const [didRemove, newTree] = removeElementFromTree2(state.tree, element)
       return {
         ...state,
-        tree: removeElementFromTree<IdentifiedData>(element)(state.tree)
+        tree: newTree//removeElementFromTree<IdentifiedData>(element)(state.tree)
       }
     default:
       return state
